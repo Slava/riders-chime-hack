@@ -1,4 +1,7 @@
 Villages = new Meteor.Collection('villages');
+Paths = new Meteor.Collection('paths');
+SelectedVillages = new Meteor.Collection("selectedvillages");
+
 // Home base
 var lat =  -29.831114;
 var longitude =  28.277982;
@@ -21,11 +24,16 @@ if (Meteor.isClient) {
 
       L.tileLayer(tileUrl).addTo(this.leaflet);
       this.leaflet.setView([-29.609988, 28.233608], 8);
+      this.leaflet.doubleClickZoom = true;
+
+     
+
 
       var that = this;
       this.leaflet.on('click', function (e) {
-        that.addTown(e.latlng);
+        //that.addTown(e.latlng);
       });
+
     }
 
     Riders.prototype.addTown = function (latlng, options) {
@@ -102,47 +110,49 @@ if (Meteor.isClient) {
   };
 }
 
-Meteor.methods( {
-  calc_path: function(type) {
+//picks the urgent villages
+function pick_villages() {
 
-    //sort by type (medicine, pregnancy, baby ...)
-    var sort_order = {};
-    sort_order[type] = -1;
-    var sorted_villages = Villages.find({}, {sort: sort_order}).fetch();
+  //sort by type (medicine, pregnancy, baby ...)
+  var urgent_villages = Villages.find({urgency_color: "#e74c3c"}).fetch();
 
-    var max_distance = 100;
-    var total_distance = 0;
-    var visit_villages = [];
+  var max_distance = 100;
+  var total_distance = 0;
+  var visit_villages = [];
 
-    //set start point as home base
-    var past_lat = -29.308319;
-    var past_long = 27.491600;
+  //var lat =  -29.831114;
+  //var longitude =  28.277982;
 
-    /*
-     * find optimal path. right now, it assumes you can only go to villages
-     * where the total path is < 100 km
-     */
+  //set start point as home base
+  var past_lat = lat;
+  var past_long = longitude;
 
-    //make sure that we are staying within max distance bounds
-    var i = 0;
-    while ((total_distance < max_distance) && i < sorted_villages.length) {
+  /*
+   * find villages to visit. right now, it assumes you can only go to villages
+   * where the total path is < 100 km
+   */
 
-      //calculate the distance between this village and the past village
-      var distance = calc_distance(past_lat, past_long, sorted_villages[i].latitude, sorted_villages[i].longitude);
+  //make sure that we are staying within max distance bounds
+  SelectedVillages.remove({});
+  var i = 0;
+  while ((total_distance < max_distance) && i < urgent_villages.length) {
 
-      //if this village is too far away, go down to the next urgent village
-      if (distance+total_distance > max_distance)
-        break;
+    //calculate the distance between this village and the past village
+    var distance = calc_distance(past_lat, past_long, urgent_villages[i].latitude, urgent_villages[i].longitude);
 
-      //if we can go there, store the village, set it as prev lat long
-      visit_villages.push(sorted_villages[i]);
-      past_lat = sorted_villages[i].latitude;
-      past_long = sorted_villages[i].longitude;
-      i++;
-    }
+    //if this village is too far away, go down to the next urgent village
+    if (distance+total_distance > max_distance)
+      break;
+
+    //if we can go there, store the village in our collection, set it as prev lat long
+    SelectedVillages.insert(urgent_villages[i]);
+    past_lat = urgent_villages[i].latitude;
+    past_long = urgent_villages[i].longitude;
+    i++;
   }
 
-});
+
+}
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
@@ -151,7 +161,60 @@ if (Meteor.isServer) {
       _.each(Data, function (x) {
         Villages.insert(x);
       });
+
+    pick_villages();
+
+    //generate paths between all villages
+    if (!Paths.find().count()) {
+      //generate list of paths between villages
+      var vils = Villages.find().fetch();
+      
+      for (var i = 0; i < vils.length; i++) {
+        var vil1 = vils[i];
+        for( var j = i+1; j<vils.length; j++) {
+          var vil2 = vils[j];
+          var newpath = build_path(vil1, vil2);
+          Paths.insert( {
+            from: vils[i]._id,
+            to: vils[j]._id,
+            path: newpath
+          });
+          
+        }
+      }
+    }
+
+
   });
+}
+
+//calculates path between two villages
+function build_path(vil1, vil2) {
+  var pt1 = [vil1.latitude, vil1.longitude];
+  var pt2 = [vil2.latitude, vil2.longitude];
+
+  var path_points = 10;
+  var path = [];
+  var inc_lat = pt2[0]-pt1[0];
+  var inc_long = pt2[1] - pt2[0];
+
+  var last_loc = pt1;
+  for (var i = 0; i < path_points; i++) {
+    var next_point = [pt1[0] + inc_lat + Math.random()/20, pt1[1] + inc_long + Math.random()/20];
+    path.push(next_point);
+  }
+
+  return path;
+}
+
+//given list of villages, returns the paths we need to draw
+function get_selected_paths(villages){
+  var paths = [];
+  for( var i = 0; i< villages.length-1; i++) {
+    paths.push[ Path.find({from: villages[i]._id], to: villages[i+1]._id}).fetch().path];
+  }
+
+  return paths;
 }
 
 // from http://www.movable-type.co.uk/scripts/latlong.html and https://github.com/boundsj/meeteor_web
