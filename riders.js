@@ -46,8 +46,7 @@ if (Meteor.isClient) {
       var draw_paths = get_paths("default");
       for (var i = 0; i < draw_paths.length; i++) {
         var draw_array = draw_paths[i];
-        var polyline = L.polyline(draw_array, {color: "red", weight: "2"});
-        polyline.addTo(this.leaflet);
+        this.drawLine(draw_array);
       }
       
       var that = this;
@@ -116,6 +115,18 @@ if (Meteor.isClient) {
       //this.detailScreen.className += ' out-right';
       this.mapScreen.className = this.mapScreen.className.replace('out-left', '');
       Session.set('details-shown', false);
+    };
+
+    Riders.prototype.drawLine = function (latlng, options) {
+      options = L.Util.extend({
+        color: '#000',
+        weight: 3,
+        opacity: 0.7
+      }, options);
+
+      var polyline = L.polyline(latlng, options);
+      polyline.editing.enable();
+      polyline.addTo(this.leaflet);
     };
 
     Riders.prototype.addMarker = function (latlng, options) {
