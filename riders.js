@@ -130,6 +130,14 @@ if (Meteor.isClient) {
       }
       var vil = Villages.findOne(Session.get('current-summary'));
       return calc_distance(longitude, lat, vil.longitude, vil.latitude).toFixed(1);
+    },
+    urgent: function () {
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return 0;
+      }
+
+      var vil = Villages.findOne(Session.get('current-summary'));
+      return calculate_urgent(new Date, vil);
     }
   });
 }
@@ -196,7 +204,7 @@ function calc_distance (lat1, lon1, lat2, lon2) {
       return (6371 * c) ; // returns kilometers
 }
 
-function calculate_color(date,village) {
+function calculate_urgent(date, village) {
     var urgent_care = 0;
     for (var i = 0; i<village.pregnant.length; i++){
       var timediff = (village.pregnant[i] - date);
@@ -216,14 +224,17 @@ function calculate_color(date,village) {
       }
     }
 
-    console.log("number urgent care is: " + urgent_care);
+    return urgent_care;
+}
+function calculate_color(date,village) {
+  var urgent_care = calculate_urgent(date, village);
 
-    if (urgent_care > 2) {
-      return "#e74c3c";
-    }
-    else if (urgent_care > 1) {
-      return "#f1c40f";
-    }
+  if (urgent_care > 2) {
+    return "#e74c3c";
+  }
+  else if (urgent_care > 1) {
+    return "#f1c40f";
+  }
 
-    return "#2ecc71";
+  return "#2ecc71";
 }
