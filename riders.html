@@ -59,7 +59,7 @@
   <div id="detail-screen" class="full-page screen out-right">
     <div class="full-scroll container">
       <button id="back-button" class="float-right">&laquo; Back</button>
-      <h1 class="text-brand">Name of Town <small>PHC</small></h1>
+      <h1 class="text-brand">{{townname}} <small>PHC</small></h1>
       <hr />
       <div class="town-info clearfix">
         <div class="town-info-item float-left">
@@ -68,7 +68,7 @@
               <img src="icons/population.png" width="30" />
             </div>
             <div class="flexbox-item">
-              <input id="population" value="133" />
+              <input id="population" value="{{population}}" />
               <label for="population">Inhabitants</label>
             </div>
           </div>
@@ -79,7 +79,7 @@
               <img src="icons/female.png" width="30" />
             </div>
             <div class="flexbox-item">
-              <input id="female" value="59" />
+              <input id="female" value="{{female}}" />
               <label for="female">Female</label>
             </div>
           </div>
@@ -90,7 +90,7 @@
               <img src="icons/male.png" width="30" />
             </div>
             <div class="flexbox-item">
-              <input id="male" value="74" />
+              <input id="male" value="{{male}}" />
               <label for="male">Male</label>
             </div>
           </div>
