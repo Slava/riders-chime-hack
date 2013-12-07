@@ -13,6 +13,7 @@ body {
 }
 
 * { box-sizing: border-box; }
+button, input, textarea { outline: none; }
 
 .page-container {
   position: absolute;
@@ -157,7 +158,6 @@ input, textarea, label {
   font-size: 1.75em;
   padding: 0;
   border: none;
-  outline: none;
 }
 
 label {

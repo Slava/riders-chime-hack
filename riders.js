@@ -10,16 +10,21 @@ if (Meteor.isClient) {
     var iconUrl = 'http://a.tiles.mapbox.com/v3/marker/pin-{size}-{text}+{color}.png';
 
     function Riders () {
+      var that = this;
       this.map = document.getElementById('map');
       this.summary = document.getElementById('summary');
       this.mapScreen = document.getElementById('map-screen');
       this.detailScreen = document.getElementById('detail-screen');
       this.backButton = document.getElementById('back-button');
+      this.filters = document.querySelectorAll('.js-filter');
 
       this.leaflet = L.map(this.map);
 
       this.summary.addEventListener('click', this.showDetail.bind(this));
       this.backButton.addEventListener('click', this.showMap.bind(this));
+      Array.prototype.forEach.call(this.filters, function (el) {
+        el.addEventListener('click', that.filterChanged.bind(that));
+      });
 
       L.tileLayer(tileUrl).addTo(this.leaflet);
       this.leaflet.setView([-29.609988, 28.233608], 8);
@@ -50,6 +55,21 @@ if (Meteor.isClient) {
         that.showSummary();
         that.lastMarker = marker;
       });
+    };
+
+    Riders.prototype.filterChanged = function (e) {
+      // Was this filter previously selected?
+      var selected = !!e.currentTarget.className.match(/selected/);
+
+      // Unselect all filters
+      Array.prototype.forEach.call(this.filters, function (el) {
+        el.className = el.className.replace(/selected/, '');
+      });
+
+      // Select current filter if it was previously un-selected
+      if (!selected) {
+        e.currentTarget.className += ' selected';
+      }
     };
 
     Riders.prototype.showSummary = function () {
