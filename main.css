@@ -72,6 +72,10 @@ h5 {
   margin-bottom: 15px;
 }
 
+h6 {
+  font-size: 1.75em;
+}
+
 /* Screens */
 
 .screen {
@@ -236,6 +240,10 @@ label {
   height: 100%;
   z-index: 100;
   background: rgba(255, 255, 255, 0.7);
+}
+
+.town-info-button {
+  width: 20px;
 }
 
 /* Utility Classes */
