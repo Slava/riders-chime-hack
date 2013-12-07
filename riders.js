@@ -444,12 +444,10 @@ function get_paths(type) {
   } else if (type=="hiv") {
 
     var home = {latitude: -29.831114, longitude: 28.277982};
-    //sambuya
-    var v1 = { latitude: -29.62187506287539, longitude: 28.59281502637935};
-
     //penyem
-    var v2 = { latitude: -29.37320948095241, longitude: 28.442143765598694};
-
+    var v1 = { latitude: -29.37320948095241, longitude: 28.442143765598694};
+    //sambuya
+    var v2 = { latitude: -29.62187506287539, longitude: 28.59281502637935};
     //kiti
     var v3 = { latitude: -29.743900174216307, longitude: 28.514337444183575};
 
