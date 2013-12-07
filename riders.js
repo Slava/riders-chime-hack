@@ -132,7 +132,7 @@ if (Meteor.isClient) {
     });
   };
 
-  Template.summaryDetails.helpers({
+  var detailsHelpers = {
     townname: function () {
       if (Session.get('current-summary') == 'homebase')
         return "Home base";
@@ -161,13 +161,32 @@ if (Meteor.isClient) {
     },
     population: function () {
       if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
-        return 0;
+        return 33;
       }
 
       var vil = Villages.findOne(Session.get('current-summary'));
-      return vil.numbermen + vil.numberwomen;
+      return vil.male + vil.female;
+    },
+    male: function () {
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return 16;
+      }
+
+      var vil = Villages.findOne(Session.get('current-summary'));
+      return vil.male;
+    },
+    female: function () {
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return 17;
+      }
+
+      var vil = Villages.findOne(Session.get('current-summary'));
+      return vil.female;
     }
-  });
+  };
+
+  Template.summaryDetails.helpers(detailsHelpers);
+  Template.detailScreen.helpers(detailsHelpers);
 }
 
 Meteor.methods( {
