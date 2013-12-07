@@ -117,9 +117,19 @@ if (Meteor.isClient) {
       if (Session.get('current-summary') == 'homebase')
         return "Home base";
       if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
-        return 'loading...';
+        return '';
       }
-      return Villages.findOne(Session.get('current-summary')).Townname;
+      var vil = Villages.findOne(Session.get('current-summary'));
+      return vil.Townname;
+    },
+    distance: function () {
+      if (Session.get('current-summary') == 'homebase')
+        return 0;
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return '';
+      }
+      var vil = Villages.findOne(Session.get('current-summary'));
+      return calc_distance(longitude, lat, vil.longitude, vil.latitude).toFixed(1);
     }
   });
 }
