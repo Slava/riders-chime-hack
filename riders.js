@@ -14,10 +14,12 @@ if (Meteor.isClient) {
       this.summary = document.getElementById('summary');
       this.mapScreen = document.getElementById('map-screen');
       this.detailScreen = document.getElementById('detail-screen');
+      this.backButton = document.getElementById('back-button');
 
       this.leaflet = L.map(this.map);
 
       this.summary.addEventListener('click', this.showDetail.bind(this));
+      this.backButton.addEventListener('click', this.showMap.bind(this));
 
       L.tileLayer(tileUrl).addTo(this.leaflet);
       this.leaflet.setView([-29.609988, 28.233608], 8);
@@ -59,6 +61,11 @@ if (Meteor.isClient) {
     Riders.prototype.showDetail = function () {
       this.detailScreen.className = this.detailScreen.className.replace('out-right', '');
       this.mapScreen.className += ' out-left';
+    };
+
+    Riders.prototype.showMap = function () {
+      this.detailScreen.className += ' out-right';
+      this.mapScreen.className = this.mapScreen.className.replace('out-left', '');
     };
 
     Riders.prototype.addMarker = function (latlng, options) {
