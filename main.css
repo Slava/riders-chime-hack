@@ -246,6 +246,24 @@ label {
   width: 20px;
 }
 
+/* Leaflet Label */
+
+.leaflet-popup-close-button {
+  display:none;
+}
+
+.leaflet-label-overlay {
+  line-height:0px;
+  margin-top: 11px;
+  text-shadow:
+    1px 1px 0px #fff,
+    1px -1px 0px #fff,
+    -1px 1px 0px #fff,
+    -1px -1px 0px #fff;
+  color: #000;
+  position:absolute;
+}
+
 /* Utility Classes */
 
 .show { display: block; }

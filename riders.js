@@ -40,7 +40,7 @@ if (Meteor.isClient) {
       });
 
       L.tileLayer(tileUrl).addTo(this.leaflet);
-      this.leaflet.setView([-29.609988, 28.233608], 8);
+      this.leaflet.setView([-29.609988, 28.433608], 10);
       this.leaflet.doubleClickZoom = true;
 
       //draw path
@@ -61,6 +61,7 @@ if (Meteor.isClient) {
 
     Riders.prototype.addTown = function (latlng, options, id) {
       var marker = this.addMarker(latlng, options);
+      var label = this.addLabel(latlng, id!=="homebase"?Villages.findOne(id).Townname:"Home Base");
       marker.id = id;
       var that = this;
   
@@ -145,6 +146,19 @@ if (Meteor.isClient) {
       return marker;
     };
 
+    Riders.prototype.addLabel = function (latlng, text) {
+      var that = this;
+      var label = new L.LabelOverlay(latlng, text);
+      this.leaflet.on('movestart', function () {
+        that.leaflet.removeLayer(label);
+      });
+      this.leaflet.on('moveend', function () {
+        that.leaflet.addLayer(label);
+      });
+      this.leaflet.addLayer(label);
+      return label;
+    };
+
     Riders.prototype.createIcon = function (options) {
       options = L.Util.extend({
         text: 'village',
@@ -167,6 +181,39 @@ if (Meteor.isClient) {
 
       return L.icon(options);
     };
+
+    L.LabelOverlay = L.Class.extend({
+      initialize: function(/*LatLng*/ latLng, /*String*/ label, options) {
+        this._latlng = latLng;
+        this._label = label;
+        L.Util.setOptions(this, options);
+      },
+      options: {
+        offset: new L.Point(0, 2)
+      },
+      onAdd: function(map) {
+        this._map = map;
+        if (!this._container) {
+          this._initLayout();
+        }
+        map.getPanes().overlayPane.appendChild(this._container);
+        this._container.innerHTML = this._label;
+        map.on('viewreset', this._reset, this);
+        this._reset();
+      },
+      onRemove: function(map) {
+        map.getPanes().overlayPane.removeChild(this._container);
+        map.off('viewreset', this._reset, this);
+      },
+      _reset: function() {
+        var pos = this._map.latLngToLayerPoint(this._latlng);
+        var op = new L.Point(pos.x + this.options.offset.x, pos.y - this.options.offset.y);
+        L.DomUtil.setPosition(this._container, op);
+      },
+      _initLayout: function() {
+        this._container = L.DomUtil.create('div', 'leaflet-label-overlay');
+      }
+    });
 
     var map = new Riders();
     MMM = map;
