@@ -320,7 +320,7 @@ function build_path(vil1, vil2) {
 function get_selected_paths(villages){
   var paths = [];
   for( var i = 0; i< villages.length-1; i++) {
-    paths.push[ Path.find({from: villages[i]._id], to: villages[i+1]._id}).fetch().path];
+    paths.push[ Path.find({from: villages[i]._id, to: villages[i+1]._id}).fetch().path];
   }
 
   return paths;
