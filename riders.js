@@ -90,13 +90,15 @@ if (Meteor.isClient) {
     };
 
     Riders.prototype.showDetail = function () {
-      this.detailScreen.className = this.detailScreen.className.replace('out-right', '');
+      //this.detailScreen.className = this.detailScreen.className.replace('out-right', '');
       this.mapScreen.className += ' out-left';
+      Session.set('details-shown', true);
     };
 
     Riders.prototype.showMap = function () {
-      this.detailScreen.className += ' out-right';
+      //this.detailScreen.className += ' out-right';
       this.mapScreen.className = this.mapScreen.className.replace('out-left', '');
+      Session.set('details-shown', false);
     };
 
     Riders.prototype.addMarker = function (latlng, options) {
@@ -233,11 +235,30 @@ if (Meteor.isClient) {
 
       var vil = Villages.findOne(Session.get('current-summary'));
       return calculate_urgent(new Date, vil) > 0 ? 'text-urgent' : '';
+    },
+
+    'class-show-details': function () {
+      return Session.get('details-shown') ? '' : 'out-right';
     }
   };
 
   Template.summaryDetails.helpers(detailsHelpers);
   Template.detailScreen.helpers(detailsHelpers);
+
+  Template.detailScreen.events({
+    'blur input': function (e) {
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return;
+      }
+
+      var vil = Session.get('current-summary');
+      var val = $(e.target).val();
+      var id = $(e.target).attr('id');
+      var setter = {};
+      setter[id] = parseInt(val);
+      Villages.update(vil, { $set: setter });
+    }
+  });
 
   Template.townInfo.amount = function () {
     var t = this.id;
