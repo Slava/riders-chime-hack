@@ -59,15 +59,7 @@
 
 <template name="detailScreen">
   <div id="detail-screen" class="full-page screen {{class-show-details}}">
-    <div id="disease-modal" class="modal hide">
-      <div class="modal-inner container">
-        <form>
-          <h5 class="text-brand">Add Important Date</h5>
-          <input type="date" />
-          <button class="btn-blue">Add Date</button>
-        </form>
-      </div>
-    </div>
+    {{> modal}}
     <div class="full-scroll container">
       <button id="back-button" class="float-right">&laquo; Back</button>
       <h1 class="text-brand">{{townname}} <small>{{community}}</small></h1>
@@ -135,9 +127,22 @@
         <label>{{label}}</label>
       </div>
       <div class="town-info-button flexbox-item vertical-center">
-        <button class="js-add-disease btn-circle btn-blue">+</button>
+        <button class="add-disease btn-circle btn-blue">+</button>
       </div>
     </div>
   </div>
+</template>
+
+<template name="modal">
+    <div id="disease-modal" class="modal hide">
+      <div class="modal-inner container">
+        <div>
+          <button class="float-right btn-circle btn-blue close">x</button>
+          <h5 class="text-brand">Add Important Date</h5>
+          <input type="date" />
+          <button class="btn-blue add-date">Add Date</button>
+        </div>
+      </div>
+    </div>
 </template>
 

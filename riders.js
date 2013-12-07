@@ -14,6 +14,8 @@ if (Meteor.isClient) {
     var tileUrl = 'http://a.tiles.mapbox.com/v3/mlmorg.gfnol46k/{z}/{x}/{y}.png';
     var iconUrl = 'http://a.tiles.mapbox.com/v3/marker/pin-{size}-{text}+{color}.png';
 
+    Session.set('details-shown', false);
+
     function Riders () {
       var that = this;
       this.map = document.getElementById('map');
@@ -30,12 +32,6 @@ if (Meteor.isClient) {
       this.backButton.addEventListener('click', this.showMap.bind(this));
       Array.prototype.forEach.call(this.filters, function (el) {
         el.addEventListener('click', that.filterChanged.bind(that));
-      });
-
-      // This needs to be done
-      this.addDiseaseButtons = document.querySelectorAll('.js-add-disease');
-      Array.prototype.forEach.call(this.addDiseaseButtons, function (el) {
-        el.addEventListener('click', that.addDisease.bind(that));
       });
 
       L.tileLayer(tileUrl).addTo(this.leaflet);
@@ -88,10 +84,6 @@ if (Meteor.isClient) {
         type = null;
       }
       Session.set('filter', type);
-    };
-
-    Riders.prototype.addDisease = function (e) {
-      this.diseaseModal.className = this.diseaseModal.className.replace(/hide/, '');
     };
 
     Riders.prototype.showSummary = function () {
@@ -281,6 +273,32 @@ if (Meteor.isClient) {
       return vil[t].length;
     return vil[t];
   };
+
+  Template.townInfo.events({
+    'click button.add-disease': function () {
+      var id = this.id;
+      // VERY HACKY GLOBAL HACK
+      EDITING_DATE_ID = id;
+      $('#disease-modal').removeClass('hide');
+    }
+  });
+
+  Template.modal.events({
+    'click button.add-date': function () {
+      var date = new Date($('input[type=date]').val());
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return 
+      }
+      var vil = Session.get('current-summary');
+      var pusher = {};
+      pusher[EDITING_DATE_ID] = date;
+      Villages.update(vil, {$push: pusher});
+      return false;
+    },
+    'click button.close': function () {
+      $('#disease-modal').addClass("hide");
+    }
+  });
 }
 
 Meteor.methods( {
