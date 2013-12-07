@@ -421,6 +421,24 @@ function get_paths(type) {
 
     //return [path1];
     return [path1, path2, path3];
+  } else if (type=="HIV") {
+
+    var home = {latitude: -29.831114, longitude: 28.277982};
+    //sambuya
+    var v1 = { latitude: -29.62187506287539, longitude: 28.59281502637935};
+
+    //penyem
+    var v2 = { latitude: -29.37320948095241, longitude: 28.442143765598694};
+
+    //kiti
+    var v3 = { latitude: = -29.743900174216307, longitude: 28.514337444183575};
+
+    var path1 = build_path(home, v1);
+    var path2 = build_path(v1, v2);
+    var path3 = build_path(v2, v3);
+    var path4 = build_path(v3, home);
+
+    return [path1, path2, path3, path4];
   }
 }
 
