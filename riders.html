@@ -3,12 +3,8 @@
 </head>
 
 <body>
-  {{> navbar}}
-  <div class="page-container">
-    {{> map}}
-    {{> summary}}
-    {{> detailScreen}}
-  </div>
+  {{> map}}
+  {{> detailScreen}}
 </body>
 
 <template name="navbar">
@@ -31,7 +27,11 @@
 
 <template name="map">
   <div id="map-screen" class="full-page screen">
-    <div id="map" class="full-page"></div>
+    {{> navbar}}
+    <div class="page-container">
+      <div id="map" class="full-page"></div>
+    </div>
+    {{> summary}}
   </div>
 </template>
 
