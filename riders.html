@@ -38,17 +38,21 @@
 <template name="summary">
   <div id="summary" class="summary-bar">
     <div class="flexbox full-page">
-      <div class="flexbox-item">
-        <h1>Name of Town</h1>
-        <h3>30 kilometers</h3>
-        <h3>65 People</h3>
-      </div>
-      <div class="summary-side flexbox-item text-center vertical-center text-urgent">
-        <h2>4</h2>
-        <h4>Urgent</h4>
-      </div>
+      {{> summaryDetails}}
     </div>
   </div>
+</template>
+
+<template name="summaryDetails">
+<div class="flexbox-item">
+  <h1>{{townname}}</h1>
+  <h3>{{distance}} kilometers</h3>
+  <h3>{{population}} People</h3>
+</div>
+<div class="summary-side flexbox-item text-center vertical-center text-urgent">
+  <h2>{{urgent}}</h2>
+  <h4>Urgent</h4>
+</div>
 </template>
 
 <template name="detailScreen">

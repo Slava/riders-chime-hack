@@ -2,7 +2,7 @@ Villages = new Meteor.Collection('villages');
 // Home base
 var lat =  -29.831114;
 var longitude =  28.277982;
-    
+
 
 if (Meteor.isClient) {
   Template.map.rendered = function () {
@@ -24,12 +24,15 @@ if (Meteor.isClient) {
 
       var that = this;
       this.leaflet.on('click', function (e) {
-        that.addTown(e.latlng);
+        $(that.summary).removeClass('show');
+        that.lastMarker.defaultIcon();
+        Session.set('current-summary', null);
       });
     }
 
-    Riders.prototype.addTown = function (latlng, options) {
+    Riders.prototype.addTown = function (latlng, options, id) {
       var marker = this.addMarker(latlng, options);
+      marker.id = id;
       var that = this;
   
       marker.defaultIcon = function () {
@@ -40,7 +43,8 @@ if (Meteor.isClient) {
         if (that.lastMarker) {
           that.lastMarker.defaultIcon();
         }
-        marker.setIcon(that.createIcon(L.Util.extend(options, { size: 'l' })));
+        marker.setIcon(that.createIcon(L.Util.extend({ size: 'l' }, options)));
+        Session.set('current-summary', this.id);
         that.showSummary();
         that.lastMarker = marker;
       });
@@ -92,14 +96,25 @@ if (Meteor.isClient) {
 
     var map = new Riders();
 
-    map.addTown([lat, longitude], { text: "hospital", color: "#8e44ad" });
+    map.addTown([lat, longitude], { text: "hospital", color: "#8e44ad" }, 'homebase');
     // put villages on map
     Deps.autorun(function () {
       Villages.find().forEach(function (vil) {
-        map.addTown([vil.latitude, vil.longitude], {color:vil.urgency_color});
+        map.addTown([vil.latitude, vil.longitude], {color:vil.urgency_color}, vil._id);
       });
     });
   };
+
+  Template.summaryDetails.helpers({
+    townname: function () {
+      if (Session.get('current-summary') == 'homebase')
+        return "Home base";
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return 'loading...';
+      }
+      return Villages.findOne(Session.get('current-summary')).Townname;
+    }
+  });
 }
 
 Meteor.methods( {
