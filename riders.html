@@ -59,6 +59,15 @@
 
 <template name="detailScreen">
   <div id="detail-screen" class="full-page screen out-right">
+    <div id="disease-modal" class="modal hide">
+      <div class="modal-inner container">
+        <form>
+          <h5 class="text-brand">Add Important Date</h5>
+          <input type="date" />
+          <button class="btn-blue">Add Date</button>
+        </form>
+      </div>
+    </div>
     <div class="full-scroll container">
       <button id="back-button" class="float-right">&laquo; Back</button>
       <h1 class="text-brand">{{townname}} <small>{{community}}</small></h1>
@@ -70,7 +79,7 @@
               <img src="icons/population.png" width="30" />
             </div>
             <div class="flexbox-item">
-              <input id="population" value="{{population}}" />
+              <input id="population" value="{{population}}" type="text" />
               <label for="population">Inhabitants</label>
             </div>
           </div>
@@ -81,7 +90,7 @@
               <img src="icons/female.png" width="30" />
             </div>
             <div class="flexbox-item">
-              <input id="female" value="{{female}}" />
+              <input id="female" value="{{female}}" type="text" />
               <label for="female">Female</label>
             </div>
           </div>
@@ -92,7 +101,7 @@
               <img src="icons/male.png" width="30" />
             </div>
             <div class="flexbox-item">
-              <input id="male" value="{{male}}" />
+              <input id="male" value="{{male}}" type="text" />
               <label for="male">Male</label>
             </div>
           </div>
@@ -115,8 +124,11 @@
         <img src="icons/{{id}}.png" width="30" />
       </div>
       <div class="flexbox-item">
-        <input id="{{id}}" value="{{amount}}" />
+        <input id="{{id}}" value="{{amount}}" type="text" />
         <label for="{{id}}">{{label}}</label>
+      </div>
+      <div class="flexbox-item vertical-center">
+        <button class="js-add-disease btn-circle btn-blue">+</button>
       </div>
     </div>
   </div>

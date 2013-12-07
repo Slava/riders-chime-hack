@@ -67,6 +67,11 @@ h4 {
   text-transform: uppercase;
 }
 
+h5 {
+  font-size: 1.5em;
+  margin-bottom: 15px;
+}
+
 /* Screens */
 
 .screen {
@@ -159,9 +164,21 @@ button.selected {
   color: #3B74E0;
 }
 
+button.btn-circle {
+  border-radius: 50%;
+  padding: 2px 5px 4px 5px;
+  line-height: 1;
+}
+
+button.btn-blue {
+  background: #3B74E0;
+  color: #fff;
+  border: none;
+}
+
 /* Forms */
 
-input, textarea, label {
+input[type="text"], textarea, label {
   display: block;
   width: 100%;
   font-family: inherit;
@@ -172,6 +189,25 @@ input, textarea, label {
 
 label {
   font-size: 1em;
+}
+
+/* Modals */
+
+.modal {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.3);
+}
+.modal-inner {
+  position: absolute;
+  width: 300px;
+  top: 20%;
+  left: 50%;
+  margin-left: -150px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  background: #fff;
 }
 
 /* Town Info */

@@ -22,6 +22,7 @@ if (Meteor.isClient) {
       this.detailScreen = document.getElementById('detail-screen');
       this.backButton = document.getElementById('back-button');
       this.filters = document.querySelectorAll('.js-filter');
+      this.diseaseModal = document.getElementById('disease-modal');
 
       this.leaflet = L.map(this.map);
 
@@ -29,6 +30,12 @@ if (Meteor.isClient) {
       this.backButton.addEventListener('click', this.showMap.bind(this));
       Array.prototype.forEach.call(this.filters, function (el) {
         el.addEventListener('click', that.filterChanged.bind(that));
+      });
+
+      // This needs to be done
+      this.addDiseaseButtons = document.querySelectorAll('.js-add-disease');
+      Array.prototype.forEach.call(this.addDiseaseButtons, function (el) {
+        el.addEventListener('click', that.addDisease.bind(that));
       });
 
       L.tileLayer(tileUrl).addTo(this.leaflet);
@@ -81,6 +88,10 @@ if (Meteor.isClient) {
         type = null;
       }
       Session.set('filter', type);
+    };
+
+    Riders.prototype.addDisease = function (e) {
+      this.diseaseModal.className = this.diseaseModal.className.replace(/hide/, '');
     };
 
     Riders.prototype.showSummary = function () {
