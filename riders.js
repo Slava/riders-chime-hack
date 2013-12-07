@@ -7,6 +7,7 @@ SelectedPaths = new Meteor.Collection("selectedpaths");
 var lat =  -29.831114;
 var longitude =  28.277982;
 var initedMap = false;
+var idToMarker = {};
 
 
 if (Meteor.isClient) {
@@ -17,6 +18,8 @@ if (Meteor.isClient) {
     var tileUrl = 'http://a.tiles.mapbox.com/v3/mlmorg.gfnol46k/{z}/{x}/{y}.png';
     var iconUrl = 'http://a.tiles.mapbox.com/v3/marker/pin-{size}-{text}+{color}.png';
 
+    Session.set('details-shown', false);
+
     function Riders () {
       var that = this;
       this.map = document.getElementById('map');
@@ -25,6 +28,7 @@ if (Meteor.isClient) {
       this.detailScreen = document.getElementById('detail-screen');
       this.backButton = document.getElementById('back-button');
       this.filters = document.querySelectorAll('.js-filter');
+      this.diseaseModal = document.getElementById('disease-modal');
 
       this.leaflet = L.map(this.map);
 
@@ -73,6 +77,7 @@ if (Meteor.isClient) {
         that.showSummary();
         that.lastMarker = marker;
       });
+      return marker;
     };
 
     Riders.prototype.filterChanged = function (e) {
@@ -84,10 +89,15 @@ if (Meteor.isClient) {
         el.className = el.className.replace(/selected/, '');
       });
 
+      var type = e.currentTarget.getAttribute('data-type');
+
       // Select current filter if it was previously un-selected
       if (!selected) {
         e.currentTarget.className += ' selected';
+      } else {
+        type = null;
       }
+      Session.set('filter', type);
     };
 
     Riders.prototype.showSummary = function () {
@@ -97,13 +107,15 @@ if (Meteor.isClient) {
     };
 
     Riders.prototype.showDetail = function () {
-      this.detailScreen.className = this.detailScreen.className.replace('out-right', '');
+      //this.detailScreen.className = this.detailScreen.className.replace('out-right', '');
       this.mapScreen.className += ' out-left';
+      Session.set('details-shown', true);
     };
 
     Riders.prototype.showMap = function () {
-      this.detailScreen.className += ' out-right';
+      //this.detailScreen.className += ' out-right';
       this.mapScreen.className = this.mapScreen.className.replace('out-left', '');
+      Session.set('details-shown', false);
     };
 
     Riders.prototype.addMarker = function (latlng, options) {
@@ -140,12 +152,29 @@ if (Meteor.isClient) {
     };
 
     var map = new Riders();
+    MMM = map;
 
     map.addTown([lat, longitude], { text: "hospital", color: "#8e44ad" }, 'homebase');
     // put villages on map
     Deps.autorun(function () {
-      Villages.find().forEach(function (vil) {
-        map.addTown([vil.latitude, vil.longitude], {color:vil.urgency_color}, vil._id);
+      var filter = {};
+      var revFilter = {};
+      if (Session.get('filter')) {
+        filter[Session.get('filter')] = { $not: { $size: 0 } };
+        revFilter[Session.get('filter')] = { $size: 0 };
+      }
+      Villages.find(revFilter).forEach(function (vil) {
+        if (_.has(idToMarker, vil._id)) {
+          map.leaflet.removeLayer(idToMarker[vil._id]);
+          delete idToMarker[vil._id];
+        }
+      });
+
+      Villages.find(filter).forEach(function (vil) {
+        if (_.has(idToMarker, vil._id))
+          return;
+        var marker = map.addTown([vil.latitude, vil.longitude], {color:vil.urgency_color}, vil._id);
+        idToMarker[vil._id] = marker;
       });
     });
   };
@@ -215,11 +244,38 @@ if (Meteor.isClient) {
               { id: "blood", label: "Blood Tests Needed" },
               { id: "medicine", label: "General Medicine Help" },
               { id: "hiv", label: "HIV+"}];
+    },
+    'urgent-css': function () {
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return "";
+      }
+
+      var vil = Villages.findOne(Session.get('current-summary'));
+      return calculate_urgent(new Date, vil) > 0 ? 'text-urgent' : '';
+    },
+
+    'class-show-details': function () {
+      return Session.get('details-shown') ? '' : 'out-right';
     }
   };
 
   Template.summaryDetails.helpers(detailsHelpers);
   Template.detailScreen.helpers(detailsHelpers);
+
+  Template.detailScreen.events({
+    'blur input': function (e) {
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return;
+      }
+
+      var vil = Session.get('current-summary');
+      var val = $(e.target).val();
+      var id = $(e.target).attr('id');
+      var setter = {};
+      setter[id] = parseInt(val);
+      Villages.update(vil, { $set: setter });
+    }
+  });
 
   Template.townInfo.amount = function () {
     var t = this.id;
@@ -231,6 +287,32 @@ if (Meteor.isClient) {
       return vil[t].length;
     return vil[t];
   };
+
+  Template.townInfo.events({
+    'click button.add-disease': function () {
+      var id = this.id;
+      // VERY HACKY GLOBAL HACK
+      EDITING_DATE_ID = id;
+      $('#disease-modal').removeClass('hide');
+    }
+  });
+
+  Template.modal.events({
+    'click button.add-date': function () {
+      var date = new Date($('input[type=date]').val());
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return 
+      }
+      var vil = Session.get('current-summary');
+      var pusher = {};
+      pusher[EDITING_DATE_ID] = date;
+      Villages.update(vil, {$push: pusher});
+      return false;
+    },
+    'click button.close': function () {
+      $('#disease-modal').addClass("hide");
+    }
+  });
 }
 
 

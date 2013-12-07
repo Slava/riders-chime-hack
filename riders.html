@@ -13,11 +13,11 @@
     <div class="navbar-inner flexbox text-center full-page">
       <div class="flexbox-item vertical-center">
         <ul class="unstyled nav clearfix">
-          <li><button class="js-filter">Blood</button></li>
-          <li><button class="js-filter">HIV+</button></li>
-          <li><button class="js-filter">Pregnancy</button></li>
-          <li><button class="js-filter">Immunization</button></li>
-          <li><button class="js-filter">Medicine</button></li>
+          <li><button class="js-filter" data-type="blood">Blood</button></li>
+          <li><button class="js-filter" data-type="hiv">HIV+</button></li>
+          <li><button class="js-filter" data-type="pregnancy">Pregnancy</button></li>
+          <li><button class="js-filter" data-type="baby">Immunization</button></li>
+          <li><button class="js-filter" data-type="medicine">Medicine</button></li>
         </ul>
       </div>
     </div>
@@ -51,17 +51,25 @@
   <h3>{{distance}} kilometers</h3>
   <h3>{{population}} People</h3>
 </div>
-<div class="summary-side flexbox-item text-center vertical-center text-urgent">
+<div class="summary-side flexbox-item text-center vertical-center {{urgent-css}}">
   <h2>{{urgent}}</h2>
   <h4>Urgent</h4>
 </div>
 </template>
 
 <template name="detailScreen">
-  <div id="detail-screen" class="full-page screen out-right">
+  <div id="detail-screen" class="full-page screen {{class-show-details}}">
+    {{> modal}}
     <div class="full-scroll container">
       <button id="back-button" class="float-right">&laquo; Back</button>
       <h1 class="text-brand">{{townname}} <small>{{community}}</small></h1>
+      <hr />
+      <div class="urgent-section">
+        <h2>Urgent</h2>
+        <ol>
+          <li>Pregnant Woman - Next Week</li>
+        </ol>
+      </div>
       <hr />
       <div class="town-info clearfix">
         <div class="town-info-item float-left">
@@ -70,7 +78,7 @@
               <img src="icons/population.png" width="30" />
             </div>
             <div class="flexbox-item">
-              <input id="population" value="{{population}}" />
+              <h6>{{population}}</h6>
               <label for="population">Inhabitants</label>
             </div>
           </div>
@@ -81,7 +89,7 @@
               <img src="icons/female.png" width="30" />
             </div>
             <div class="flexbox-item">
-              <input id="female" value="{{female}}" />
+              <input id="female" value="{{female}}" type="text" />
               <label for="female">Female</label>
             </div>
           </div>
@@ -92,7 +100,7 @@
               <img src="icons/male.png" width="30" />
             </div>
             <div class="flexbox-item">
-              <input id="male" value="{{male}}" />
+              <input id="male" value="{{male}}" type="text" />
               <label for="male">Male</label>
             </div>
           </div>
@@ -115,10 +123,26 @@
         <img src="icons/{{id}}.png" width="30" />
       </div>
       <div class="flexbox-item">
-        <input id="{{id}}" value="{{amount}}" />
-        <label for="{{id}}">{{label}}</label>
+        <h6>{{amount}}</h6>
+        <label>{{label}}</label>
+      </div>
+      <div class="town-info-button flexbox-item vertical-center">
+        <button class="add-disease btn-circle btn-blue">+</button>
       </div>
     </div>
   </div>
+</template>
+
+<template name="modal">
+    <div id="disease-modal" class="modal hide">
+      <div class="modal-inner container">
+        <div>
+          <button class="float-right btn-circle btn-blue close">x</button>
+          <h5 class="text-brand">Add Important Date</h5>
+          <input type="date" />
+          <button class="btn-blue add-date">Add Date</button>
+        </div>
+      </div>
+    </div>
 </template>
 
