@@ -26,6 +26,7 @@
 </template>
 
 <template name="map">
+{{#constant}}
   <div id="map-screen" class="full-page screen">
     {{> navbar}}
     <div class="page-container">
@@ -33,6 +34,7 @@
     </div>
     {{> summary}}
   </div>
+{{/constant}}
 </template>
 
 <template name="summary">
@@ -98,64 +100,24 @@
       </div>
 
       <div class="town-info clearfix">
-        <div class="town-info-item">
-          <div class="flexbox">
-            <div class="flexbox-item town-info-icon vertical-center">
-              <img src="icons/pregnancy.png" width="30" />
-            </div>
-            <div class="flexbox-item">
-              <input id="pregnancy" value="3" />
-              <label for="pregnancy">Pregnant Women</label>
-            </div>
-          </div>
-        </div>
-        <div class="town-info-item">
-          <div class="flexbox">
-            <div class="flexbox-item town-info-icon vertical-center">
-              <img src="icons/baby.png" width="30" />
-            </div>
-            <div class="flexbox-item">
-              <input id="baby" value="7" />
-              <label for="baby">Immunizations Needed</label>
-            </div>
-          </div>
-        </div>
-        <div class="town-info-item">
-          <div class="flexbox">
-            <div class="flexbox-item town-info-icon vertical-center">
-              <img src="icons/blood.png" width="30" />
-            </div>
-            <div class="flexbox-item">
-              <input id="blood" value="10" />
-              <label for="blood">Blood Tests Needed</label>
-            </div>
-          </div>
-        </div>
-        <div class="town-info-item">
-          <div class="flexbox">
-            <div class="flexbox-item town-info-icon vertical-center">
-              <img src="icons/medicine.png" width="30" />
-            </div>
-            <div class="flexbox-item">
-              <input id="medicine" value="14" />
-              <label for="medicine">General Medicine Help</label>
-            </div>
-          </div>
-        </div>
-        <div class="town-info-item">
-          <div class="flexbox">
-            <div class="flexbox-item town-info-icon vertical-center">
-              <img src="icons/hiv.png" width="30" />
-            </div>
-            <div class="flexbox-item">
-              <input id="hiv" value="3" />
-              <label for="hiv">HIV+</label>
-            </div>
-          </div>
-        </div>
-      </div>
-
+        {{#each needs}}
+          {{> townInfo}}
+        {{/each}}
       <hr />
+    </div>
+  </div>
+</template>
+
+<template name="townInfo">
+  <div class="town-info-item">
+    <div class="flexbox">
+      <div class="flexbox-item town-info-icon vertical-center">
+        <img src="icons/{{id}}.png" width="30" />
+      </div>
+      <div class="flexbox-item">
+        <input id="{{id}}" value="{{amount}}" />
+        <label for="{{id}}">{{label}}</label>
+      </div>
     </div>
   </div>
 </template>

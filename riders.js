@@ -2,10 +2,14 @@ Villages = new Meteor.Collection('villages');
 // Home base
 var lat =  -29.831114;
 var longitude =  28.277982;
+var initedMap = false;
 
 
 if (Meteor.isClient) {
   Template.map.rendered = function () {
+    if (initedMap)
+      return;
+    initedMap = true;
     var tileUrl = 'http://a.tiles.mapbox.com/v3/mlmorg.gfnol46k/{z}/{x}/{y}.png';
     var iconUrl = 'http://a.tiles.mapbox.com/v3/marker/pin-{size}-{text}+{color}.png';
 
@@ -182,11 +186,29 @@ if (Meteor.isClient) {
 
       var vil = Villages.findOne(Session.get('current-summary'));
       return vil.female;
+    },
+    needs: function () {
+      return [{ id: "pregnancy", label: "Pregnant Women" },
+              { id: "baby", label: "Immunizations Needed" },
+              { id: "blood", label: "Blood Tests Needed" },
+              { id: "medicine", label: "General Medicine Help" },
+              { id: "hiv", label: "HIV+"}];
     }
   };
 
   Template.summaryDetails.helpers(detailsHelpers);
   Template.detailScreen.helpers(detailsHelpers);
+
+  Template.townInfo.amount = function () {
+    var t = this.id;
+    if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+      return 0;
+    }
+    var vil = Villages.findOne(Session.get('current-summary'));
+    if (_.isArray(vil[t]))
+      return vil[t].length;
+    return vil[t];
+  };
 }
 
 Meteor.methods( {
@@ -253,8 +275,8 @@ function calc_distance (lat1, lon1, lat2, lon2) {
 
 function calculate_urgent(date, village) {
     var urgent_care = 0;
-    for (var i = 0; i<village.pregnant.length; i++){
-      var timediff = (village.pregnant[i] - date);
+    for (var i = 0; i<village.pregnancy.length; i++){
+      var timediff = (village.pregnancy[i] - date);
       var daysdiff = Math.ceil(timediff / (1000 * 3600 * 24));
 
       if(daysdiff< 14) {
@@ -263,7 +285,7 @@ function calculate_urgent(date, village) {
     }
 
     for (var i = 0; i<village.hiv.length; i++){
-      var timediff = (village.pregnant[i] - date);
+      var timediff = (village.hiv[i] - date);
       var daysdiff = Math.ceil(timediff / (1000 * 3600 * 24));
 
       if(daysdiff< 14) {
