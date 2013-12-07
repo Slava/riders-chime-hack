@@ -106,7 +106,7 @@
         {{#each needs}}
           {{> townInfo}}
         {{/each}}
-      <hr />
+      </div>
     </div>
   </div>
 </template>
@@ -143,12 +143,26 @@
 
 <template name="urgencies">
 <div class="urgent-section">
-  <h2>Urgent</h2>
-  <ol>
-    {{#each urgencies}}
-      <li>{{label}} - {{dateForm}}</li>
-    {{/each}}
-  </ol>
+  <div class="flexbox">
+    <div class="flexbox-item">
+      <h3 class="label">
+        <span class="urgent-label label-inner">Urgent This Week</span>
+      </h3>
+      <ol class="unstyled">
+        <li>3 pregnant women</li>
+        <li>2 HIV+ patients</li>
+      </ol>
+    </div>
+    <div class="flexbox-item">
+      <h3 class="label">
+        <span class="label-inner">Next Week</span>
+      </h3>
+      <ol class="unstyled">
+        <li>2 pregnant women</li>
+        <li>1 HIV+ patients</li>
+      </ol>
+    </div>
+  </div>
 </div>
 </template>
 

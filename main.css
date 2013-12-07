@@ -264,6 +264,21 @@ label {
   position:absolute;
 }
 
+/* Urgent Section */
+
+.urgent-section {
+  padding-bottom: 10px;
+}
+
+ol.unstyled {
+  list-style: none;
+  padding-left: 10px;
+}
+ol.unstyled li {
+  font-size: 1.2em;
+  margin-bottom: 7px;
+}
+
 /* Utility Classes */
 
 .show { display: block; }
@@ -303,3 +318,14 @@ label {
 
 .text-urgent { color: #e22b2b; }
 .text-brand { color: #3B74E0; }
+
+.label-inner {
+  display: inline-block;
+  padding: 6px 6px;
+  background: #ddd;
+  color: #222;
+}
+.urgent-label {
+  background: #e22b2b;
+  color: #fff;
+}
