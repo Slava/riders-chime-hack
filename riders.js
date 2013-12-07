@@ -459,7 +459,67 @@ function get_paths(type) {
     return [path1, path2, path3, path4];
   }
   else if (type=="blood") {
+    var home = {latitude: -29.831114, longitude: 28.277982};
+    //bakary
+    var v1 = { latitude: -29.65193836454948, longitude: 28.33433359451049};
+    //sambuya
+    var v2 = { latitude: -29.62187506287539, longitude: 28.59281502637935};
 
+    var path1 = build_path(home, v1);
+    var path2 = build_path(v1, v2);
+    var path3 = build_path(v2, home);
+
+    //return [path1];
+    return [path1, path2, path3];
+  }
+  else if (type=="pregnancy") {
+    var home = {latitude: -29.831114, longitude: 28.277982};
+    //basura
+    var v1 = { latitude: -29.690116150362357, longitude: 28.390072692273343};
+    //sambuya
+    var v2 = { latitude: -29.62187506287539, longitude: 28.59281502637935};
+    //kiti
+    var v3 = { latitude: -29.743900174216307, longitude: 28.514337444183575};
+
+    var path1 = build_path(home, v1);
+    var path2 = build_path(v1, v2);
+    var path3 = build_path(v2, v3);
+    var path4 = build_path(v3, home);
+
+    return [path1, path2, path3, path4];
+
+  }
+  else if (type=="baby") {
+    var home = {latitude: -29.831114, longitude: 28.277982};
+    //bakary
+    var v1 = { latitude: -29.65193836454948, longitude: 28.33433359451049};
+    //manduar
+    var v2 = { latitude: -29.470415935443654, longitude: 28.51467336199169};
+    //basura
+    var v3 = { latitude: -29.690116150362357, longitude: 28.390072692273343};
+
+    var path1 = build_path(home, v1);
+    var path2 = build_path(v1, v2);
+    var path3 = build_path(v2, v3);
+    var path4 = build_path(v3, home);
+
+    return [path1, path2, path3, path4];
+  }
+  else if (type=="medicine") {
+    var home = {latitude: -29.831114, longitude: 28.277982};
+    //sambuya
+    var v1 = { latitude: -29.62187506287539, longitude: 28.59281502637935};
+    //manduar
+    var v2 = { latitude: -29.470415935443654, longitude: 28.51467336199169};
+    //penyem
+    var v3 = { latitude: -29.37320948095241, longitude: 28.442143765598694};
+
+    var path1 = build_path(home, v1);
+    var path2 = build_path(v1, v2);
+    var path3 = build_path(v2, v3);
+    var path4 = build_path(v3, home);
+
+    return [path1, path2, path3, path4];
   }
 }
 
