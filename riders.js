@@ -3,6 +3,7 @@ Villages = new Meteor.Collection('villages');
 var lat =  -29.831114;
 var longitude =  28.277982;
 var initedMap = false;
+var idToMarker = {};
 
 
 if (Meteor.isClient) {
@@ -59,6 +60,7 @@ if (Meteor.isClient) {
         that.showSummary();
         that.lastMarker = marker;
       });
+      return marker;
     };
 
     Riders.prototype.filterChanged = function (e) {
@@ -70,10 +72,15 @@ if (Meteor.isClient) {
         el.className = el.className.replace(/selected/, '');
       });
 
+      var type = e.currentTarget.getAttribute('data-type');
+
       // Select current filter if it was previously un-selected
       if (!selected) {
         e.currentTarget.className += ' selected';
+      } else {
+        type = null;
       }
+      Session.set('filter', type);
     };
 
     Riders.prototype.showSummary = function () {
@@ -126,12 +133,29 @@ if (Meteor.isClient) {
     };
 
     var map = new Riders();
+    MMM = map;
 
     map.addTown([lat, longitude], { text: "hospital", color: "#8e44ad" }, 'homebase');
     // put villages on map
     Deps.autorun(function () {
-      Villages.find().forEach(function (vil) {
-        map.addTown([vil.latitude, vil.longitude], {color:vil.urgency_color}, vil._id);
+      var filter = {};
+      var revFilter = {};
+      if (Session.get('filter')) {
+        filter[Session.get('filter')] = { $not: { $size: 0 } };
+        revFilter[Session.get('filter')] = { $size: 0 };
+      }
+      Villages.find(revFilter).forEach(function (vil) {
+        if (_.has(idToMarker, vil._id)) {
+          map.leaflet.removeLayer(idToMarker[vil._id]);
+          delete idToMarker[vil._id];
+        }
+      });
+
+      Villages.find(filter).forEach(function (vil) {
+        if (_.has(idToMarker, vil._id))
+          return;
+        var marker = map.addTown([vil.latitude, vil.longitude], {color:vil.urgency_color}, vil._id);
+        idToMarker[vil._id] = marker;
       });
     });
   };
