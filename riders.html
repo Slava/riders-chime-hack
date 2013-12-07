@@ -1,0 +1,37 @@
+<head>
+  <title>ChimeHack</title>
+</head>
+
+<body>
+  {{> navbar}}
+  <div class="page-container">
+    {{> map}}
+  </div>
+</body>
+
+<template name="navbar">
+{{#constant}}
+  <div class="navbar">
+    <div class="navbar-inner flexbox text-center full-page">
+      <div class="flexbox-item vertical-center">
+        <ul class="unstyled nav clearfix">
+          <li><button class="selected">Blood</button></li>
+          <li><button>HIV+</button></li>
+          <li><button>Pregnancy</button></li>
+          <li><button>Immunization</button></li>
+          <li><button>Medicine</button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+{{/constant}}
+</template>
+
+<template name="map">
+  <div id="map-screen" class="full-page">
+    <div id="map" class="full-page"></div>
+  </div>
+  <div id="detail-screen" class="full-page hide">
+  </div>
+</template>
+
