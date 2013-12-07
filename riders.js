@@ -225,6 +225,14 @@ if (Meteor.isClient) {
               { id: "blood", label: "Blood Tests Needed" },
               { id: "medicine", label: "General Medicine Help" },
               { id: "hiv", label: "HIV+"}];
+    },
+    'urgent-css': function () {
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return "";
+      }
+
+      var vil = Villages.findOne(Session.get('current-summary'));
+      return calculate_urgent(new Date, vil) > 0 ? 'text-urgent' : '';
     }
   };
 
