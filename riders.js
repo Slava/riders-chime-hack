@@ -8,6 +8,7 @@ var lat =  -29.831114;
 var longitude =  28.277982;
 var initedMap = false;
 var idToMarker = {};
+var idToPath = [];
 
 
 if (Meteor.isClient) {
@@ -43,7 +44,7 @@ if (Meteor.isClient) {
       this.leaflet.doubleClickZoom = true;
 
       //draw path
-      var draw_paths = get_paths("default");
+      var draw_paths = get_paths(null);
       for (var i = 0; i < draw_paths.length; i++) {
         var draw_array = draw_paths[i];
         this.drawLine(draw_array);
@@ -97,6 +98,9 @@ if (Meteor.isClient) {
         type = null;
       }
       Session.set('filter', type);
+      
+      //redraw paths based on filter
+      console.log("filter is: " + type);
     };
 
     Riders.prototype.showSummary = function () {
@@ -125,6 +129,8 @@ if (Meteor.isClient) {
       }, options);
 
       var polyline = L.polyline(latlng, options);
+      idToPath.push(polyline);
+
       polyline.editing.enable();
       polyline.addTo(this.leaflet);
     };
@@ -187,6 +193,19 @@ if (Meteor.isClient) {
         var marker = map.addTown([vil.latitude, vil.longitude], {color:vil.urgency_color}, vil._id);
         idToMarker[vil._id] = marker;
       });
+
+      if(idToPath.length) {
+        for (var v = 0; v<idToPath.length; v++) {
+          map.leaflet.removeLayer(idToPath[v]);
+        }
+        idToPath = [];
+      }
+
+      var paths = get_paths(Session.get('filter'));
+      _.each(paths, function (path) {
+        map.drawLine(path);
+      });
+
     });
   };
 
@@ -406,7 +425,7 @@ function build_path(vil1, vil2) {
 
 //generates the paths given type
 function get_paths(type) {
-  if (type=="default") {
+  if (!type) {
     var home = {latitude: -29.831114, longitude: 28.277982};
 
     //basura
@@ -421,7 +440,8 @@ function get_paths(type) {
 
     //return [path1];
     return [path1, path2, path3];
-  } else if (type=="HIV") {
+
+  } else if (type=="hiv") {
 
     var home = {latitude: -29.831114, longitude: 28.277982};
     //sambuya
@@ -431,7 +451,7 @@ function get_paths(type) {
     var v2 = { latitude: -29.37320948095241, longitude: 28.442143765598694};
 
     //kiti
-    var v3 = { latitude: = -29.743900174216307, longitude: 28.514337444183575};
+    var v3 = { latitude: -29.743900174216307, longitude: 28.514337444183575};
 
     var path1 = build_path(home, v1);
     var path2 = build_path(v1, v2);
@@ -439,6 +459,9 @@ function get_paths(type) {
     var path4 = build_path(v3, home);
 
     return [path1, path2, path3, path4];
+  }
+  else if (type=="blood") {
+
   }
 }
 
