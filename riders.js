@@ -187,6 +187,14 @@ if (Meteor.isClient) {
       var vil = Villages.findOne(Session.get('current-summary'));
       return vil.female;
     },
+    community: function () {
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return "PHC";
+      }
+
+      var vil = Villages.findOne(Session.get('current-summary'));
+      return vil.community;
+    },
     needs: function () {
       return [{ id: "pregnancy", label: "Pregnant Women" },
               { id: "baby", label: "Immunizations Needed" },
