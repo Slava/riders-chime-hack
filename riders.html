@@ -3,12 +3,8 @@
 </head>
 
 <body>
-  {{> navbar}}
-  <div class="page-container">
-    {{> map}}
-    {{> summary}}
-    {{> detailScreen}}
-  </div>
+  {{> map}}
+  {{> detailScreen}}
 </body>
 
 <template name="navbar">
@@ -17,11 +13,11 @@
     <div class="navbar-inner flexbox text-center full-page">
       <div class="flexbox-item vertical-center">
         <ul class="unstyled nav clearfix">
-          <li><button class="selected">Blood</button></li>
-          <li><button>HIV+</button></li>
-          <li><button>Pregnancy</button></li>
-          <li><button>Immunization</button></li>
-          <li><button>Medicine</button></li>
+          <li><button class="js-filter">Blood</button></li>
+          <li><button class="js-filter">HIV+</button></li>
+          <li><button class="js-filter">Pregnancy</button></li>
+          <li><button class="js-filter">Immunization</button></li>
+          <li><button class="js-filter">Medicine</button></li>
         </ul>
       </div>
     </div>
@@ -30,30 +26,99 @@
 </template>
 
 <template name="map">
+{{#constant}}
   <div id="map-screen" class="full-page screen">
-    <div id="map" class="full-page"></div>
+    {{> navbar}}
+    <div class="page-container">
+      <div id="map" class="full-page"></div>
+    </div>
+    {{> summary}}
   </div>
+{{/constant}}
 </template>
 
 <template name="summary">
-  <div id="summary" class="summary-bar">
+  <div id="summary" class="summary-bar container">
     <div class="flexbox full-page">
-      <div class="flexbox-item">
-        <h1>Name of Town</h1>
-        <h3>30 kilometers</h3>
-        <h3>65 People</h3>
-      </div>
-      <div class="summary-side flexbox-item text-center vertical-center text-urgent">
-        <h2>4</h2>
-        <h4>Urgent</h4>
-      </div>
+      {{> summaryDetails}}
     </div>
   </div>
 </template>
 
+<template name="summaryDetails">
+<div class="flexbox-item">
+  <h1>{{townname}}</h1>
+  <h3>{{distance}} kilometers</h3>
+  <h3>{{population}} People</h3>
+</div>
+<div class="summary-side flexbox-item text-center vertical-center text-urgent">
+  <h2>{{urgent}}</h2>
+  <h4>Urgent</h4>
+</div>
+</template>
+
 <template name="detailScreen">
   <div id="detail-screen" class="full-page screen out-right">
-    <h1>Name of Town</h1>
+    <div class="full-scroll container">
+      <button id="back-button" class="float-right">&laquo; Back</button>
+      <h1 class="text-brand">{{townname}} <small>PHC</small></h1>
+      <hr />
+      <div class="town-info clearfix">
+        <div class="town-info-item float-left">
+          <div class="flexbox">
+            <div class="flexbox-item town-info-icon vertical-center">
+              <img src="icons/population.png" width="30" />
+            </div>
+            <div class="flexbox-item">
+              <input id="population" value="{{population}}" />
+              <label for="population">Inhabitants</label>
+            </div>
+          </div>
+        </div>
+        <div class="town-info-item float-left">
+          <div class="flexbox">
+            <div class="flexbox-item town-info-icon vertical-center">
+              <img src="icons/female.png" width="30" />
+            </div>
+            <div class="flexbox-item">
+              <input id="female" value="{{female}}" />
+              <label for="female">Female</label>
+            </div>
+          </div>
+        </div>
+        <div class="town-info-item float-left">
+          <div class="flexbox">
+            <div class="flexbox-item town-info-icon vertical-center">
+              <img src="icons/male.png" width="30" />
+            </div>
+            <div class="flexbox-item">
+              <input id="male" value="{{male}}" />
+              <label for="male">Male</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="town-info clearfix">
+        {{#each needs}}
+          {{> townInfo}}
+        {{/each}}
+      <hr />
+    </div>
+  </div>
+</template>
+
+<template name="townInfo">
+  <div class="town-info-item">
+    <div class="flexbox">
+      <div class="flexbox-item town-info-icon vertical-center">
+        <img src="icons/{{id}}.png" width="30" />
+      </div>
+      <div class="flexbox-item">
+        <input id="{{id}}" value="{{amount}}" />
+        <label for="{{id}}">{{label}}</label>
+      </div>
+    </div>
   </div>
 </template>
 
