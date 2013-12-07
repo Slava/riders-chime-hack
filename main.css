@@ -108,6 +108,7 @@ h4 {
 .summary-side {
   width: 100px;
   border-left: 1px solid #eee;
+  color: #666;
 }
 
 /* Lists */
