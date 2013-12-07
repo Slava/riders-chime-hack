@@ -1,4 +1,8 @@
 Villages = new Meteor.Collection('villages');
+// Home base
+var lat =  -29.831114;
+var longitude =  28.277982;
+    
 
 if (Meteor.isClient) {
   Template.map.rendered = function () {
@@ -24,19 +28,19 @@ if (Meteor.isClient) {
       });
     }
 
-    Riders.prototype.addTown = function (latlng) {
-      var marker = this.addMarker(latlng);
+    Riders.prototype.addTown = function (latlng, options) {
+      var marker = this.addMarker(latlng, options);
       var that = this;
   
       marker.defaultIcon = function () {
-        this.setIcon(that.createIcon());
+        this.setIcon(that.createIcon(options));
       };
   
       marker.on('click', function () {
         if (that.lastMarker) {
           that.lastMarker.defaultIcon();
         }
-        marker.setIcon(that.createIcon({ size: 'l' }));
+        marker.setIcon(that.createIcon(L.Util.extend(options, { size: 'l' })));
         that.showSummary();
         that.lastMarker = marker;
       });
@@ -86,14 +90,108 @@ if (Meteor.isClient) {
       return L.icon(options);
     };
 
-    new Riders();
+    var map = new Riders();
 
+    map.addTown([lat, longitude], { text: "hospital", color: "#8e44ad" });
+    // put villages on map
+    Deps.autorun(function () {
+      Villages.find().forEach(function (vil) {
+        map.addTown([vil.latitude, vil.longitude], {color:vil.urgency_color});
+      });
+    });
   };
 }
 
+Meteor.methods( {
+  calc_path: function(type) {
+
+    //sort by type (medicine, pregnancy, baby ...)
+    var sort_order = {};
+    sort_order[type] = -1;
+    var sorted_villages = Villages.find({}, {sort: sort_order}).fetch();
+
+    var max_distance = 100;
+    var total_distance = 0;
+    var visit_villages = [];
+
+    //set start point as home base
+    var past_lat = -29.308319;
+    var past_long = 27.491600;
+
+    /*
+     * find optimal path. right now, it assumes you can only go to villages
+     * where the total path is < 100 km
+     */
+
+    //make sure that we are staying within max distance bounds
+    var i = 0;
+    while ((total_distance < max_distance) && i < sorted_villages.length) {
+
+      //calculate the distance between this village and the past village
+      var distance = calc_distance(past_lat, past_long, sorted_villages[i].latitude, sorted_villages[i].longitude);
+
+      //if this village is too far away, go down to the next urgent village
+      if (distance+total_distance > max_distance)
+        break;
+
+      //if we can go there, store the village, set it as prev lat long
+      visit_villages.push(sorted_villages[i]);
+      past_lat = sorted_villages[i].latitude;
+      past_long = sorted_villages[i].longitude;
+      i++;
+    }
+  }
+
+});
+
 if (Meteor.isServer) {
   Meteor.startup(function () {
+
     if (!Villages.find().count())
-      ;
+      _.each(Data, function (x) {
+        Villages.insert(x);
+      });
   });
+}
+
+// from http://www.movable-type.co.uk/scripts/latlong.html and https://github.com/boundsj/meeteor_web
+function calc_distance (lat1, lon1, lat2, lon2) { 
+      var dLat = (lat2 - lat1) * Math.PI / 180,
+      dLon = (lon2 - lon1) * Math.PI / 180,
+      a = Math.pow(Math.sin(dLat / 2), 2) + Math.cos(lat1 * Math.PI / 180)
+        * Math.cos(lat2 * Math.PI / 180) * Math.pow(Math.sin(dLon / 2), 2),
+      c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return (6371 * c) ; // returns kilometers
+}
+
+function calculate_color(date,village) {
+    var urgent_care = 0;
+    for (var i = 0; i<village.pregnant.length; i++){
+      var timediff = (village.pregnant[i] - date);
+      var daysdiff = Math.ceil(timediff / (1000 * 3600 * 24));
+
+      if(daysdiff< 14) {
+        urgent_care = urgent_care + 1;
+      }
+    }
+
+    for (var i = 0; i<village.hiv.length; i++){
+      var timediff = (village.pregnant[i] - date);
+      var daysdiff = Math.ceil(timediff / (1000 * 3600 * 24));
+
+      if(daysdiff< 14) {
+        urgent_care = urgent_care + 1;
+      }
+    }
+
+    console.log("number urgent care is: " + urgent_care);
+
+    if (urgent_care > 2) {
+      return "#e74c3c";
+    }
+    else if (urgent_care > 1) {
+      return "#f1c40f";
+    }
+
+    return "#2ecc71";
 }
