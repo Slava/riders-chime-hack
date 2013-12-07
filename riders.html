@@ -64,12 +64,7 @@
       <button id="back-button" class="float-right">&laquo; Back</button>
       <h1 class="text-brand">{{townname}} <small>{{community}}</small></h1>
       <hr />
-      <div class="urgent-section">
-        <h2>Urgent</h2>
-        <ol>
-          <li>Pregnant Woman - Next Week</li>
-        </ol>
-      </div>
+      {{> urgencies}}
       <hr />
       <div class="town-info clearfix">
         <div class="town-info-item float-left">
@@ -144,5 +139,16 @@
         </div>
       </div>
     </div>
+</template>
+
+<template name="urgencies">
+<div class="urgent-section">
+  <h2>Urgent</h2>
+  <ol>
+    {{#each urgencies}}
+      <li>{{label}} - {{dateForm}}</li>
+    {{/each}}
+  </ol>
+</div>
 </template>
 

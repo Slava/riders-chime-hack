@@ -215,7 +215,7 @@ if (Meteor.isClient) {
       }
 
       var vil = Villages.findOne(Session.get('current-summary'));
-      return calculate_urgent(new Date, vil);
+      return calculate_urgent(new Date, vil).length;
     },
     population: function () {
       if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
@@ -262,7 +262,7 @@ if (Meteor.isClient) {
       }
 
       var vil = Villages.findOne(Session.get('current-summary'));
-      return calculate_urgent(new Date, vil) > 0 ? 'text-urgent' : '';
+      return calculate_urgent(new Date, vil).length > 0 ? 'text-urgent' : '';
     },
 
     'class-show-details': function () {
@@ -357,7 +357,13 @@ if (Meteor.isServer) {
     }*/
 
 
-
+    if (!Villages.find().count())
+      _.each(Data, function (x) {
+        Villages.insert(x);
+      });
+    Villages.find().forEach(function (v) {
+      Villages.update(v._id, _.extend(v, { urgency_color: calculate_color(new Date, v) }));
+    });
   });
 }
 
@@ -429,37 +435,29 @@ function calc_distance (lat1, lon1, lat2, lon2) {
 }
 
 function calculate_urgent(date, village) {
-    var urgent_care = 0;
-    for (var i = 0; i<village.pregnancy.length; i++){
-      var timediff = (village.pregnancy[i] - date);
-      var daysdiff = Math.ceil(timediff / (1000 * 3600 * 24));
+    var urgent_care = [];
 
-      if(daysdiff< 14) {
-        urgent_care = urgent_care + 1;
-      }
-    }
-
-    for (var i = 0; i<village.hiv.length; i++){
-      var timediff = (village.hiv[i] - date);
-      var daysdiff = Math.ceil(timediff / (1000 * 3600 * 24));
-
-      if(daysdiff< 14) {
-        urgent_care = urgent_care + 1;
-      }
-    }
+    _.each(['hiv', 'pregnancy', 'baby'], function (type) {
+      urgent_care = urgent_care.concat(_.filter(village[type], function (d) {
+        return Math.ceil((d - date) / (1000 * 3600 * 24)) < 14;
+      }));
+    });
 
     return urgent_care;
 }
 function calculate_color(date,village) {
-  var urgent_care = calculate_urgent(date, village);
+  var urgent_care = calculate_urgent(date, village).length;
 
-  if (urgent_care > 2) {
+  if (urgent_care > 7) {
+    // red
     return "#e74c3c";
   }
   else if (urgent_care > 1) {
+    // yellow
     return "#f1c40f";
   }
 
+  // green
   return "#2ecc71";
 }
 
