@@ -158,6 +158,14 @@ if (Meteor.isClient) {
 
       var vil = Villages.findOne(Session.get('current-summary'));
       return calculate_urgent(new Date, vil);
+    },
+    population: function () {
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return 0;
+      }
+
+      var vil = Villages.findOne(Session.get('current-summary'));
+      return vil.numbermen + vil.numberwomen;
     }
   });
 }
