@@ -390,6 +390,20 @@ if (Meteor.isClient) {
       $('#disease-modal').addClass("hide");
     }
   });
+
+  Template.urgencies.helpers({
+    urgent: function (type, num) {
+      console.log(type, num)
+      if (!Session.get('current-summary') || !Villages.findOne(Session.get('current-summary'))) {
+        return 0;
+      }
+      var date = new Date;
+      var vil = Villages.findOne(Session.get('current-summary'));
+      return _.filter(vil[type], function (d) {
+        return Math.ceil((d - date) / (1000 * 3600 * 24)) < num;
+      }).length;
+    }
+  });
 }
 
 
